@@ -90,15 +90,18 @@ function watchFocus() {
   keytrap = document.getElementById('keytrap');
 
   keytrap.addEventListener('input', () => {
+    const typed = keytrap.value;
     keytrap.value = '';
+    if (settingsOpen) return;
+    for (const key of typed) type(key);
   });
   keytrap.addEventListener('blur', () => {
     window.setTimeout(grabKeys, 0);
   });
   window.addEventListener('focus', grabKeys);
-  document.addEventListener('pointerdown', (event) => {
+  document.addEventListener('click', (event) => {
     if (event.target.closest('button, input, label, a')) return;
-    window.setTimeout(grabKeys, 0);
+    grabKeys();
   });
 
   grabKeys();
@@ -278,10 +281,17 @@ function bindControls() {
     zen.blur();
   });
 
-  document.addEventListener('mousemove', () => {
+  const reveal = () => {
     if (!prefs.zen || revealed || settingsOpen) return;
     revealed = true;
     paintFocus();
+  };
+  document.addEventListener('mousemove', reveal);
+  document.addEventListener('touchstart', reveal, { passive: true });
+
+  document.getElementById('new-run').addEventListener('click', (event) => {
+    event.currentTarget.blur();
+    startRun();
   });
 
   const sound = document.getElementById('sound');
@@ -533,9 +543,12 @@ function onKeyDown(event) {
 
   if (event.key.length !== 1) return;
   event.preventDefault();
+  type(event.key);
+}
 
+function type(key) {
   const before = session;
-  session = pressKey(session, event.key, performance.now());
+  session = pressKey(session, key, performance.now());
   if (session === before) return;
 
   observeNew();

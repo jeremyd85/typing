@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
 <title>sudden death — accuracy typing</title>
 <link rel="stylesheet" href="css/style.css">
 <script src="js/theme-boot.js"></script>
@@ -17,7 +17,10 @@
       <h1>sudden death</h1>
       <p class="tagline">accuracy first. speed follows.</p>
     </div>
-    <button type="button" id="settings-open" class="toggle">settings</button>
+    <div class="masthead-actions">
+      <button type="button" id="new-run">new run</button>
+      <button type="button" id="settings-open" class="toggle">settings</button>
+    </div>
   </header>
 
   <main class="play" id="play">
@@ -45,6 +48,7 @@
     <p class="hint">
       a wrong key refuses to land. no backspace, ever. while the cursor is gone the keyboard is locked.
       <span class="hint-keys"><kbd>Tab</kbd> new run <kbd>Esc</kbd> restart</span>
+      <span class="hint-touch">tap the words to bring the keyboard back</span>
     </p>
 
     <section class="results" id="results" hidden>
@@ -55,7 +59,10 @@
         <h3>sentences in this run</h3>
         <ul id="results-credit-list"></ul>
       </section>
-      <p class="results-prompt"><kbd>Tab</kbd> for another run</p>
+      <p class="results-prompt">
+        <span class="hint-keys"><kbd>Tab</kbd> for another run</span>
+        <span class="hint-touch">tap new run for another run</span>
+      </p>
     </section>
 
     <section class="panel">

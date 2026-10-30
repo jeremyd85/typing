@@ -1574,6 +1574,73 @@ async function run() {
     }
   });
 
+  await cdp.send('Emulation.setDeviceMetricsOverride', {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 3,
+    mobile: true,
+  });
+  await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+  await open();
+
+  const phone = () =>
+    evaluate(`({
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      touchHint: getComputedStyle(document.querySelector('.hint .hint-touch')).display,
+      keyHint: getComputedStyle(document.querySelector('.hint .hint-keys')).display,
+      shortestButton: Math.min(...[...document.querySelectorAll('button')]
+        .filter(b => b.offsetParent)
+        .map(b => b.getBoundingClientRect().height)),
+      focused: document.activeElement?.id ?? null,
+    })`);
+
+  const phoneStart = await probe();
+  const phonePlay = await phone();
+  await shoot('/tmp/tg-phone.png');
+
+  for (const ch of `${phoneStart.words[0]} `) await cdp.send('Input.insertText', { text: ch });
+  const insertedWord = await probe();
+
+  await type(wrongLetterFor(phoneStart.words[1][0]));
+  const insertedTypo = await probe();
+
+  await evaluate(`document.getElementById('new-run').click()`);
+  const freshRun = await probe();
+  const freshFocus = await phone();
+
+  await evaluate(`document.getElementById('settings-open').click()`);
+  const phoneSettings = await phone();
+  await shoot('/tmp/tg-phone-settings.png');
+  await evaluate(`document.getElementById('settings-close').click()`);
+
+  check('nothing scrolls sideways on a phone, in play or in settings', () => {
+    assert.ok(phonePlay.overflow <= 0, `play overflowed by ${phonePlay.overflow}px`);
+    assert.ok(phoneSettings.overflow <= 0, `settings overflowed by ${phoneSettings.overflow}px`);
+  });
+  check('a touch screen gets the tap hint instead of the key hint', () => {
+    assert.notEqual(phonePlay.touchHint, 'none');
+    assert.equal(phonePlay.keyHint, 'none');
+  });
+  check('every button is a full size tap target on a touch screen', () => {
+    assert.ok(phonePlay.shortestButton >= 44, `a play button was ${phonePlay.shortestButton}px`);
+    assert.ok(
+      phoneSettings.shortestButton >= 44,
+      `a settings button was ${phoneSettings.shortestButton}px`,
+    );
+  });
+  check('text from a keyboard that sends no key events still types', () => {
+    assert.equal(insertedWord.progress, '1/25');
+    assert.equal(insertedWord.active, phoneStart.words[1]);
+  });
+  check('inserted text and key events share one engine', () =>
+    assert.equal(insertedTypo.drillVisible, true));
+  check('the new run button starts a run and hands the keyboard back', () => {
+    assert.equal(freshRun.progress, '0/25');
+    assert.equal(freshRun.drillVisible, false);
+    assert.equal(freshFocus.focused, 'keytrap');
+  });
+
+  await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: false });
   await cdp.send('Emulation.clearDeviceMetricsOverride');
   await sleep(150);
 
