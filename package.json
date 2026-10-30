@@ -1,0 +1,13 @@
+{
+  "name": "sudden-death-typing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "node tools/serve.mjs",
+    "test": "node --test tests/",
+    "test:browser": "node tests/browser.mjs",
+    "test:firefox": "node tests/firefox.mjs",
+    "build:data": "node --max-old-space-size=8192 tools/build-data.mjs"
+  }
+}

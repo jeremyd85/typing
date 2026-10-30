@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sudden death — accuracy typing</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-boot.js"></script>
+</head>
+<body>
+<input id="keytrap" class="keytrap" type="text" autocomplete="off" autocapitalize="off"
+       autocorrect="off" spellcheck="false" aria-label="type here">
+<div class="page">
+
+  <header class="masthead">
+    <div>
+      <h1>sudden death</h1>
+      <p class="tagline">accuracy first. speed follows.</p>
+    </div>
+    <button type="button" id="settings-open" class="toggle">settings</button>
+  </header>
+
+  <main class="play" id="play">
+
+    <dl class="readout">
+      <div class="readout-cell"><dt>wpm</dt><dd id="stat-wpm">0</dd></div>
+      <div class="readout-cell"><dt>accuracy</dt><dd id="stat-accuracy">100%</dd></div>
+      <div class="readout-cell"><dt>words</dt><dd id="stat-progress">0/25</dd></div>
+      <div class="readout-cell"><dt>drills</dt><dd id="stat-drills">0</dd></div>
+    </dl>
+
+    <section class="arena" id="arena">
+      <div class="stream" id="stream">
+        <div class="stream-inner" id="stream-inner"></div>
+        <span class="caret" id="caret" hidden></span>
+      </div>
+
+      <div class="drillbar" id="drillbar">
+        <span class="drillbar-title">sudden death</span>
+        <ol class="pips" id="pips"></ol>
+        <span class="drillbar-note" id="drill-note"></span>
+      </div>
+    </section>
+
+    <p class="hint">
+      a wrong key refuses to land. no backspace, ever. while the cursor is gone the keyboard is locked.
+      <span class="hint-keys"><kbd>Tab</kbd> new run <kbd>Esc</kbd> restart</span>
+    </p>
+
+    <section class="results" id="results" hidden>
+      <h2 id="results-title">run complete</h2>
+      <dl class="results-grid" id="results-grid"></dl>
+      <p class="results-drilled" id="results-drilled"></p>
+      <section class="results-credits" id="results-credits" hidden>
+        <h3>sentences in this run</h3>
+        <ul id="results-credit-list"></ul>
+      </section>
+      <p class="results-prompt"><kbd>Tab</kbd> for another run</p>
+    </section>
+
+    <section class="panel">
+      <h2>problem words</h2>
+      <ul class="problems" id="problems"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>slow words</h2>
+      <ul class="problems" id="slow"></ul>
+    </section>
+
+    <p class="lifetime" id="lifetime"></p>
+
+    <p class="credit-link"><a href="credits.html">credits and licences</a></p>
+
+  </main>
+
+  <section class="settings" id="settings" hidden aria-label="Settings">
+
+    <div class="settings-head">
+      <h2>settings</h2>
+      <button type="button" id="settings-close" class="toggle">done</button>
+    </div>
+
+    <div class="setting">
+      <span class="setting-name">text</span>
+      <div class="group" id="modes" role="group" aria-label="Text source">
+        <button type="button" data-mode="words">words</button>
+        <button type="button" data-mode="sentences">sentences</button>
+      </div>
+      <p class="setting-note">words are drawn from the most common English words. sentences are whole sentences with their capitals and punctuation.</p>
+    </div>
+
+    <div class="setting" id="setting-words">
+      <span class="setting-name">word mode</span>
+      <div class="group">
+        <button type="button" id="contractions" class="toggle" aria-pressed="true">contractions on</button>
+        <button type="button" id="punctuation" class="toggle" aria-pressed="false">punctuation off</button>
+        <button type="button" id="capitals" class="toggle" aria-pressed="false">capitals off</button>
+      </div>
+      <p class="setting-note">contractions are ranked with every other word. punctuation and capitals land on about one word in five each, at random. none of it changes which word is tracked.</p>
+    </div>
+
+    <div class="setting" id="setting-sentence-length" hidden>
+      <span class="setting-name">sentence length</span>
+      <div class="group" id="spans" role="group" aria-label="Sentence length">
+        <button type="button" data-span="short">short</button>
+        <button type="button" data-span="medium">medium</button>
+        <button type="button" data-span="long">long</button>
+        <button type="button" data-span="any">any</button>
+      </div>
+      <p class="setting-note">short is 3 to 6 words, medium 5 to 12, long 10 to 30, and any has no limit. a run still ends on a whole sentence.</p>
+    </div>
+
+    <div class="setting" id="setting-vocabulary" hidden>
+      <span class="setting-name">vocabulary</span>
+      <div class="group" id="vocabularies" role="group" aria-label="Sentence vocabulary">
+        <button type="button" data-vocabulary="any">any</button>
+        <button type="button" data-vocabulary="mostly">mostly common</button>
+        <button type="button" data-vocabulary="common">common only</button>
+      </div>
+      <p class="setting-note">how many rare words a sentence may hold. rare means beyond the 3000 most frequent words. common only allows none, and mostly common allows about one word in seven.</p>
+    </div>
+
+    <div class="setting">
+      <span class="setting-name">run length</span>
+      <div class="group" id="lengths" role="group" aria-label="Run length">
+        <button type="button" data-length="10">10</button>
+        <button type="button" data-length="25">25</button>
+        <button type="button" data-length="50">50</button>
+      </div>
+      <p class="setting-note">sentence runs take whole sentences, so they overshoot rather than cut one short.</p>
+    </div>
+
+    <div class="setting">
+      <span class="setting-name">sudden death reps</span>
+      <div class="group" id="reps" role="group" aria-label="Sudden death reps">
+        <button type="button" data-reps="3">3</button>
+        <button type="button" data-reps="5">5</button>
+        <button type="button" data-reps="7">7</button>
+        <button type="button" data-reps="10">10</button>
+      </div>
+      <p class="setting-note">clean passes you owe before a missed word lets you go.</p>
+    </div>
+
+    <div class="setting">
+      <label class="setting-name" for="penalty">penalty</label>
+      <div class="group">
+        <input class="slider" type="range" id="penalty" min="0" max="1000" step="50" value="250">
+        <output class="group-value" id="penalty-value" for="penalty">250ms</output>
+      </div>
+      <p class="setting-note">how long the keyboard stays locked after a wrong key. the cursor is gone for exactly that long.</p>
+    </div>
+
+    <div class="setting">
+      <span class="setting-name">keyboard</span>
+      <div class="group" id="layouts" role="group" aria-label="Keyboard layout">
+        <button type="button" data-layout="qwerty">qwerty</button>
+        <button type="button" data-layout="colemak-dh">colemak-dh</button>
+      </div>
+      <p class="setting-note">decides which keys count as neighbours when a slip is classified.</p>
+    </div>
+
+    <div class="setting">
+      <span class="setting-name">theme</span>
+      <div class="group" id="themes" role="group" aria-label="Colour theme">
+        <button type="button" data-theme="system">auto</button>
+        <button type="button" data-theme="light">light</button>
+        <button type="button" data-theme="dark">dark</button>
+      </div>
+    </div>
+
+    <div class="setting">
+      <span class="setting-name">while typing</span>
+      <div class="group">
+        <button type="button" id="zen" class="toggle" aria-pressed="true">zen on</button>
+        <button type="button" id="sound" class="toggle" aria-pressed="false">sound off</button>
+      </div>
+      <p class="setting-note">zen hides everything but the words while you type. move the mouse to bring it back.</p>
+    </div>
+
+    <div class="setting">
+      <span class="setting-name">progress</span>
+      <div class="group">
+        <button type="button" id="export">export json</button>
+        <button type="button" id="import">import json</button>
+        <button type="button" id="reset">reset progress</button>
+      </div>
+      <p class="notice" id="notice" role="status"></p>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+    </div>
+
+    <p class="credits" id="credits">Sentences are from the Tatoeba Project under CC BY 2.0 FR, each credited to its author. The word list is built with the English Speller Database, copyright Kevin Atkinson. <a href="credits.html">Full credits and licences</a>.</p>
+
+  </section>
+
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
